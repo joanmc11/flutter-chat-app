@@ -1,8 +1,11 @@
+import 'package:chat/helpers/mostrar_alerta.dart';
+import 'package:chat/services/auth_service.dart';
 import 'package:chat/widgets/boton_azul.dart';
 import 'package:flutter/material.dart';
 import 'package:chat/widgets/custom_input.dart';
 import 'package:chat/widgets/labels.dart';
 import 'package:chat/widgets/logo.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -13,13 +16,16 @@ class LoginPage extends StatelessWidget {
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Container(
-              height: MediaQuery.of(context).size.height *0.9,
+              height: MediaQuery.of(context).size.height * 0.9,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: const [
                   Logo(titulo: 'Messenger'),
                   _Form(),
-                  Labels(ruta: 'register', question: '¿No tienes cuenta?', text: 'Crea una ahora!'),
+                  Labels(
+                      ruta: 'register',
+                      question: '¿No tienes cuenta?',
+                      text: 'Crea una ahora!'),
                   Text(
                     'Términos y condiciones de uso',
                     style: TextStyle(fontWeight: FontWeight.w200),
@@ -45,6 +51,8 @@ class __FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -62,15 +70,23 @@ class __FormState extends State<_Form> {
           textController: passCtrl,
           isPassword: true,
         ),
-
-        BotonAzul(text: 'ingrese', onPressed: (){
-          debugPrint(emailCtrl.text);
-          debugPrint(passCtrl.text);
-
-        })
-
-        //TODO: Crear Button
-        
+        BotonAzul(
+          text: 'ingrese',
+          onPressed: authService.autenticando
+              ? null
+              : () async {
+                  FocusScope.of(context).unfocus();
+                  final loginOk = await authService.login(
+                      emailCtrl.text.trim(), passCtrl.text.trim());
+                  if(loginOk){
+                    //TODO: conectar a nuestro socket server
+                    Navigator.pushReplacementNamed(context, 'usuarios');
+                  } else{
+                    //Mostrar alerta                  
+                    await mostrarAlerta(context, 'Login incorrecto', 'Creedenciales erroneas');
+                  }
+                },
+        )
       ]),
     );
   }

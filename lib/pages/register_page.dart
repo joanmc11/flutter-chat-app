@@ -1,8 +1,11 @@
+import 'package:chat/helpers/mostrar_alerta.dart';
+import 'package:chat/services/auth_service.dart';
 import 'package:chat/widgets/boton_azul.dart';
 import 'package:flutter/material.dart';
 import 'package:chat/widgets/custom_input.dart';
 import 'package:chat/widgets/labels.dart';
 import 'package:chat/widgets/logo.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatelessWidget {
   @override
@@ -13,13 +16,16 @@ class RegisterPage extends StatelessWidget {
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Container(
-              height: MediaQuery.of(context).size.height *0.9,
+              height: MediaQuery.of(context).size.height * 0.9,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: const [
                   Logo(titulo: 'Registro'),
                   _Form(),
-                  Labels(ruta: 'login', question: '¿Ya tienes una cuenta?',text: 'Ingresa ahora!'),
+                  Labels(
+                      ruta: 'login',
+                      question: '¿Ya tienes una cuenta?',
+                      text: 'Ingresa ahora!'),
                   Text(
                     'Términos y condiciones de uso',
                     style: TextStyle(fontWeight: FontWeight.w200),
@@ -46,6 +52,8 @@ class __FormState extends State<_Form> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -69,15 +77,30 @@ class __FormState extends State<_Form> {
           textController: passCtrl,
           isPassword: true,
         ),
+        BotonAzul(
+            text: 'Crear cuenta',
+            onPressed: authService.autenticando
+                ? null
+                : () async {
+                    FocusScope.of(context).unfocus();
 
-        BotonAzul(text: 'ingrese', onPressed: (){
-          debugPrint(emailCtrl.text);
-          debugPrint(passCtrl.text);
-
-        })
-
-        //TODO: Crear Button
-        
+                    final registerOk = await authService.register(
+                        nameCtrl.text.trim(),
+                        emailCtrl.text.trim(),
+                        passCtrl.text.trim());
+                    if (registerOk == true) {
+                      //TODO: Conectar socket server
+                      
+                      // ignore: use_build_context_synchronously
+                      await mostrarAlerta(context, '¡Registro completo!',
+                          'Registro almacenado con éxito');
+                      Navigator.pushReplacementNamed(context, 'usuarios');
+                    } else {
+                      // ignore: use_build_context_synchronously
+                      await mostrarAlerta(
+                          context, 'Error de registro', registerOk ?? 'No se ha podido completar el registro');
+                    }
+                  })
       ]),
     );
   }

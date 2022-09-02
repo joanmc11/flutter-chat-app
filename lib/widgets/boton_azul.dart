@@ -3,28 +3,29 @@ import 'package:flutter/material.dart';
 class BotonAzul extends StatelessWidget {
   const BotonAzul({
     Key? key,
-    required this.text, required this.onPressed,
+    required this.text,
+    required this.onPressed,
   }) : super(key: key);
 
   final String text;
-  final Function() onPressed;
- 
+  final Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ButtonStyle(
         elevation: MaterialStateProperty.all(2),
-        backgroundColor: MaterialStateProperty.all(Colors.blue),
         shape: MaterialStateProperty.all(const StadiumBorder()),
+        backgroundColor: MaterialStateProperty.all(
+            onPressed == null ? Colors.grey : Colors.blue),
       ),
       onPressed: onPressed,
-      child:  SizedBox(
+      child: SizedBox(
           width: double.infinity,
           height: 55,
           child: Center(
             child: Text(text,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 17,
                 )),
