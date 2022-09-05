@@ -8,7 +8,7 @@ import 'package:chat/models/login_response.dart';
 import 'package:chat/models/usuario.dart';
 
 class AuthService with ChangeNotifier {
-  late Usuario usuario;
+  Usuario? usuario;
   bool _autenticando = false;
 
   //Crear instancia Storage
@@ -75,7 +75,7 @@ class AuthService with ChangeNotifier {
 
     if (resp.statusCode == 200) {
       final loginResponse = loginResponseFromJson(resp.body);
-      
+      usuario = loginResponse.usuario;
 
       await _guardarToken(loginResponse.token);
 
@@ -106,6 +106,7 @@ class AuthService with ChangeNotifier {
       
 
       await _guardarToken(loginResponse.token);
+      usuario = loginResponse.usuario;
 
       
 

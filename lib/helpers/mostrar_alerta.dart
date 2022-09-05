@@ -29,7 +29,7 @@ mostrarAlerta(BuildContext context, String titulo, String subtitulo) {
         actions: [
           CupertinoDialogAction(
             isDefaultAction: true,
-            child: Text('Ok'),
+            child: const Text('Ok'),
             onPressed: () => Navigator.pop(context),
           )
         ],
